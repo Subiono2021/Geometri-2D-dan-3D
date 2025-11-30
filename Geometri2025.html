@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MathEdu - GeoGebra & AI Lokal 100% GRATIS</title>
+    
+    <!-- MathJax Configuration -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+                tags: 'ams'
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+                renderActions: {
+                    addMenu: [0, '', '']
+                }
+            },
+            startup: {
+                ready: function() {
+                    MathJax.startup.defaultReady();
+                    console.log('MathJax is ready');
+                }
+            }
+        };
+    </script>
+    
+    <!-- Load MathJax -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --accent: #f59e0b;
+            --background: #f8fafc;
+            --text: #1e293b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--background);
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 500;
+            transition: color 0.3s;
+            cursor: pointer;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        
+        .hero {
+            text-align: center;
+            padding: 3rem 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .hero p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .platform-info {
+            background: white;
+            padding: 3rem 0;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .info-card {
+            background: #f8fafc;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .info-card h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .section {
+            padding: 2rem 0;
+        }
+        
+        .view-toggle {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .toggle-btn {
+            padding: 1rem 2rem;
+            background: white;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .toggle-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .toggle-btn:hover:not(.active) {
+            background: #e0e7ff;
+        }
+        
+        .geogebra-sub-toggle {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1rem;
+            gap: 0.5rem;
+        }
+        
+        .sub-toggle-btn {
+            padding: 0.7rem 1.5rem;
+            background: #f1f5f9;
+            border: 2px solid #cbd5e1;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .sub-toggle-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .view-container {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        .view-container.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* PERBAIKAN UTAMA: GeoGebra View Styles - Responsif dan Proporsional */
+        .geogebra-view {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .geogebra-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        /* PERBAIKAN UTAMA: Container iframe yang benar-benar proporsional untuk GeoGebra 3D */
+        .geogebra-iframe-container {
+            width: 100%;
+            flex: 1;
+            position: relative;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+            min-height: 500px;
+            background: #f8fafc;
+            /* Pastikan konten tidak terpotong */
+            overflow: visible;
+        }
+        
+        /* PERBAIKAN KHUSUS: Iframe dengan rasio aspek yang tepat untuk GeoGebra 3D */
+        .geogebra-iframe-wrapper {
+            position: relative;
+            width: 100%;
+            height: 0;
+            padding-bottom: 75%; /* Rasio 4:3 yang optimal untuk GeoGebra 3D */
+            overflow: hidden;
+            border-radius: 8px;
+        }
+        
+        .geogebra-iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: none;
+            transition: all 0.3s ease;
+            /* Pastikan konten iframe tidak terpotong */
+            overflow: visible;
+        }
+        
+        .geogebra-iframe.active {
+            display: block;
+        }
+        
+        /* Efek hover untuk iframe yang aktif */
+        .geogebra-iframe-wrapper:hover .geogebra-iframe.active {
+            transform: scale(1.01);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .geogebra-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        /* AI View Styles */
+        .ai-view {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .ai-header {
+            margin-bottom: 1rem;
+        }
+        
+        .ai-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            height: 100%;
+            flex: 1;
+        }
+        
+        .knowledge-panel {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+        
+        .chat-panel {
+            display: flex;
+            flex-direction: column;
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+        
+        .ai-chat {
+            flex: 1;
+            overflow-y: auto;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: white;
+            min-height: 300px;
+        }
+        
+        .ai-message {
+            margin-bottom: 1rem;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            max-width: 85%;
+            word-wrap: break-word;
+            line-height: 1.5;
+            position: relative;
+        }
+        
+        .ai-user {
+            background: #dbeafe;
+            margin-left: auto;
+            text-align: right;
+        }
+        
+        .ai-bot {
+            background: #f1f5f9;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .ai-thinking {
+            background: #fff3cd;
+            color: #856404;
+            font-style: italic;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .ai-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .ai-success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+        
+        .copy-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(0,0,0,0.1);
+            border: none;
+            border-radius: 3px;
+            padding: 2px 6px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .ai-message:hover .copy-btn {
+            opacity: 1;
+        }
+        
+        .ai-input {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .ai-input input {
+            flex: 1;
+            padding: 0.8rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        
+        .ai-input input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .ai-input button {
+            padding: 0.8rem 1.5rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s;
+        }
+        
+        .ai-input button:hover:not(:disabled) {
+            background: #1d4ed8;
+        }
+        
+        .ai-input button:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+        }
+        
+        .chat-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 0.7rem 1.2rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover {
+            background: #1d4ed8;
+        }
+        
+        .btn-secondary {
+            background: var(--secondary);
+        }
+        
+        .btn-secondary:hover {
+            background: #475569;
+        }
+        
+        .btn-success {
+            background: #10b981;
+        }
+        
+        .btn-success:hover {
+            background: #059669;
+        }
+        
+        .btn-info {
+            background: #06b6d4;
+        }
+        
+        .btn-info:hover {
+            background: #0891b2;
+        }
+        
+        .api-success {
+            background: #d1fae5;
+            border: 2px solid #a7f3d0;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            color: #065f46;
+        }
+        
+        .knowledge-base-info {
+            background: #f0f9ff;
+            border: 2px solid #bae6fd;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .geogebra-examples {
+            margin-top: 1rem;
+        }
+        
+        .example-btns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        footer {
+            background: #1e293b;
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 4rem;
+        }
+        
+        /* PERBAIKAN: Responsif untuk iframe 3D */
+        @media (max-width: 768px) {
+            .ai-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .example-btns {
+                grid-template-columns: 1fr;
+            }
+            
+            .toggle-btn {
+                padding: 0.8rem 1.5rem;
+                font-size: 1rem;
+            }
+            
+            .geogebra-view, .ai-view {
+                height: auto;
+                min-height: 500px;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .geogebra-sub-toggle {
+                flex-direction: column;
+            }
+            
+            /* Perbaikan khusus untuk iframe di mobile */
+            .geogebra-iframe-container {
+                min-height: 400px;
+            }
+            
+            /* Rasio lebih tinggi untuk mobile */
+            .geogebra-iframe-wrapper {
+                padding-bottom: 85%;
+            }
+        }
+
+        /* PERBAIKAN TAMBAHAN: Untuk layar yang lebih besar */
+        @media (min-width: 1200px) {
+            .geogebra-iframe-container {
+                min-height: 600px;
+            }
+            
+            /* Rasio lebih rendah untuk desktop besar */
+            .geogebra-iframe-wrapper {
+                padding-bottom: 65%;
+            }
+        }
+        
+        /* PERBAIKAN KHUSUS: Untuk rasio aspek yang lebih baik di berbagai ukuran */
+        @media (min-width: 1400px) {
+            .geogebra-iframe-wrapper {
+                padding-bottom: 60%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav class="nav-container">
+                <div class="logo">MathEdu - GeoGebra & AI Lokal</div>
+                <ul class="nav-links">
+                    <li><a href="#home">Beranda</a></li>
+                    <li><a href="#geometri">Geometri</a></li>
+                    <li><a id="nav-ai-lokal">AI-Lokal</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero" id="home">
+        <div class="container">
+            <h1>Matematika Interaktif 100% GRATIS</h1>
+            <p>Platform edukasi dengan GeoGebra Geometry dan AI Lokal - Pilih tampilan yang paling nyaman! Temukan cara baru yang menyenangkan untuk belajar geometri dengan alat yang powerful dan mudah digunakan.</p>
+        </div>
+    </section>
+
+    <section class="platform-info">
+        <div class="container">
+            <h2 style="text-align: center; color: var(--primary); margin-bottom: 1rem;">Kenapa Memilih MathEdu?</h2>
+            <p style="text-align: center; max-width: 800px; margin: 0 auto 2rem; font-size: 1.1rem;">
+                MathEdu adalah platform pembelajaran matematika revolusioner yang menggabungkan teknologi terkini dengan pendekatan edukasi yang terbukti efektif.
+            </p>
+            
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>🎯 GeoGebra Terintegrasi</h3>
+                    <p>Akses penuh ke GeoGebra Geometry 2D dan 3D langsung dari browser Anda. Buat, eksplorasi, dan visualisasi konsep geometri dengan alat yang digunakan oleh jutaan siswa dan guru di seluruh dunia.</p>
+                </div>
+                
+                <div class="info-card">
+                    <h3>🤖 AI Lokal 100% Gratis</h3>
+                    <p>Tidak perlu API key, tidak perlu biaya berlangganan. Asisten AI kami berjalan sepenuhnya di browser Anda dengan pengetahuan geometri yang komprehensif.</p>
+                </div>
+                
+                <div class="info-card">
+                    <h3>💾 Penyimpanan Lokal</h3>
+                    <p>Semua pengetahuan dan percakapan disimpan secara lokal di perangkat Anda. Privasi terjamin dan dapat diakses kapan saja tanpa koneksi internet untuk AI.</p>
+                </div>
+                
+                <div class="info-card">
+                    <h3>📚 Knowledge Base Terpadu</h3>
+                    <p>Dilengkapi dengan basis pengetahuan geometri yang luas, dari konsep dasar hingga lanjutan. Anda bahkan dapat menambahkan pengetahuan sendiri!</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="geometri" class="section">
+        <div class="container">
+            <div class="view-toggle">
+                <button class="toggle-btn active" id="toggle-geogebra">
+                    <span>🎯</span> Tampilkan Geometri GeoGebra
+                </button>
+                <button class="toggle-btn" id="toggle-ai">
+                    <span>🤖</span> Tampilkan AI Lokal
+                </button>
+            </div>
+            
+            <!-- GeoGebra View -->
+            <div id="geogebra-view" class="view-container active">
+                <div class="geogebra-view">
+                    <div class="geogebra-header">
+                        <h2 style="color: var(--primary);">🎯 GeoGebra Geometry</h2>
+                        <div class="geogebra-controls">
+                            <button class="btn btn-info" onclick="reloadGeoGebra()">🔄 Muat Ulang</button>
+                            <button class="btn btn-success" onclick="openInNewTab()">🔗 Buka di Tab Baru</button>
+                        </div>
+                    </div>
+                    
+                    <div class="geogebra-sub-toggle">
+                        <button class="sub-toggle-btn active" id="toggle-2d">📐 Geometri 2D</button>
+                        <button class="sub-toggle-btn" id="toggle-3d">🧊 Geometri 3D</button>
+                    </div>
+                    
+                    <!-- PERBAIKAN UTAMA: Container iframe yang benar-benar proporsional -->
+                    <div class="geogebra-iframe-container">
+                        <div class="geogebra-iframe-wrapper">
+                            <iframe id="geogebra-iframe-2d" class="geogebra-iframe active" 
+                                    src="https://www.geogebra.org/geometry?lang=id" 
+                                    title="GeoGebra Geometry 2D" allowfullscreen>
+                            </iframe>
+                            <iframe id="geogebra-iframe-3d" 
+        class="geogebra-iframe" 
+        src="https://www.geogebra.org/3d?lang=id" 
+        title="GeoGebra Geometry 3D" 
+        allowfullscreen
+        style="width: 100%; height: 500px;">
+</iframe>
+                        </div>
+                    </div>
+                    
+                    <div class="geogebra-examples">
+                        <h4 style="margin: 1rem 0 0.5rem 0; color: var(--primary);">Contoh Cepat:</h4>
+                        <div class="example-btns">
+                            <button class="btn btn-secondary" onclick="loadExample('pythagoras')">Segitiga Pythagoras</button>
+                            <button class="btn btn-secondary" onclick="loadExample('circle')">Lingkaran & Tangen</button>
+                            <button class="btn btn-secondary" onclick="loadExample('triangle')">Segitiga Sama Sisi</button>
+                            <button class="btn btn-secondary" onclick="loadExample('polygon')">Poligon Beraturan</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- AI View -->
+            <div id="ai-view" class="view-container">
+                <div class="ai-view">
+                    <div class="ai-header">
+                        <h2 style="color: var(--primary); margin-bottom: 0.5rem;">🤖 Asisten AI Geometri - LOKAL 100% GRATIS</h2>
+                        <div class="api-success">
+                            <strong>🎉 100% GRATIS - AI LOKAL!</strong><br>
+                            Tidak perlu API key, tidak perlu internet. Semua pengetahuan geometri tersimpan lokal di browser Anda.
+                        </div>
+                    </div>
+                    
+                    <div class="ai-content">
+                        <div class="knowledge-panel">
+                            <div class="knowledge-base-info">
+                                <strong>📚 Knowledge Base Stats:</strong>
+                                <div id="knowledge-stats" style="margin-top: 0.5rem;">
+                                    Memuat statistik pengetahuan...
+                                </div>
+                                <button id="show-knowledge-base" class="btn btn-info" style="margin-top: 0.5rem; width: 100%;">
+                                    📖 Lihat Semua Topik yang Tersedia
+                                </button>
+                            </div>
+                            
+                            <div style="margin-top: 1.5rem;">
+                                <h4 style="color: var(--primary); margin-bottom: 0.5rem;">💡 Pertanyaan Contoh:</h4>
+                                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                    <button class="btn btn-secondary example-question" data-question="Jelaskan konsep teorema Pythagoras">Teorema Pythagoras</button>
+                                    <button class="btn btn-secondary example-question" data-question="Apa perbedaan antara luas dan keliling?">Luas vs Keliling</button>
+                                    <button class="btn btn-secondary example-question" data-question="Bagaimana cara menghitung volume kubus?">Volume Kubus</button>
+                                    <button class="btn btn-secondary example-question" data-question="Jelaskan sifat-sifat segitiga sama sisi">Segitiga Sama Sisi</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="chat-panel">
+                            <div class="ai-chat" id="ai-chat">
+                                <div class="ai-message ai-bot">
+                                    👋 Halo! Saya asisten AI Geometri <strong>LOKAL 100% GRATIS</strong>. 
+                                    Saya bisa membantu Anda memahami konsep geometri dengan pengetahuan yang tersimpan secara lokal.
+                                    <br><br>
+                                    <strong>Coba tanyakan:</strong> 
+                                    <ul>
+                                        <li>Teorema Pythagoras</li>
+                                        <li>Luas dan keliling bangun datar</li>
+                                        <li>Volume bangun ruang</li>
+                                        <li>Sifat-sifat segitiga</li>
+                                        <li>Transformasi geometri</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="ai-input">
+                                <input type="text" id="ai-input" placeholder="Tanyakan tentang geometri...">
+                                <button id="ai-send">📤 Kirim</button>
+                            </div>
+                            
+                            <div class="chat-controls">
+                                <button id="clear-chat" class="btn btn-secondary">🗑️ Bersihkan Chat</button>
+                                <button id="add-knowledge" class="btn btn-success">➕ Tambah Pengetahuan</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal untuk menambah pengetahuan -->
+    <div id="knowledge-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+        <div style="background: white; padding: 2rem; border-radius: 12px; width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto;">
+            <h3 style="margin-bottom: 1rem; color: var(--primary);">➕ Tambah Pengetahuan Baru</h3>
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Kata Kunci (pisahkan dengan koma):</label>
+                <input type="text" id="new-keywords" placeholder="contoh: volume kerucut, luas permukaan limas" style="width: 100%; padding: 0.7rem; border: 2px solid #cbd5e1; border-radius: 6px;">
+            </div>
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Jawaban/Penjelasan:</label>
+                <textarea id="new-answer" placeholder="Jelaskan konsep dengan jelas, gunakan $...$ untuk rumus matematika" style="width: 100%; padding: 0.7rem; border: 2px solid #cbd5e1; border-radius: 6px; height: 150px; resize: vertical;"></textarea>
+            </div>
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Contoh (opsional):</label>
+                <textarea id="new-examples" placeholder="Berikan contoh perhitungan atau aplikasi" style="width: 100%; padding: 0.7rem; border: 2px solid #cbd5e1; border-radius: 6px; height: 100px; resize: vertical;"></textarea>
+            </div>
+            <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                <button id="cancel-add-knowledge" class="btn btn-secondary">Batal</button>
+                <button id="save-knowledge" class="btn btn-success">💾 Simpan Pengetahuan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal untuk melihat knowledge base -->
+    <div id="view-knowledge-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+        <div style="background: white; padding: 2rem; border-radius: 12px; width: 90%; max-width: 800px; max-height: 80vh; overflow-y: auto;">
+            <h3 style="margin-bottom: 1rem; color: var(--primary);">📚 Semua Topik Pengetahuan Geometri</h3>
+            <div id="knowledge-base-list" style="margin-bottom: 1rem;">
+                <!-- Daftar knowledge base akan dimuat di sini -->
+            </div>
+            <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                <button id="close-view-knowledge" class="btn btn-secondary">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2027 MathEdu - Platform Pembelajaran Matematika dengan GeoGebra & AI Lokal 100% GRATIS</p>
+            <p style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;">
+                MathEdu menghadirkan revolusi dalam pembelajaran matematika dengan menggabungkan alat visual GeoGebra 2D & 3D dan kecerdasan buatan lokal yang dapat diakses oleh semua orang tanpa biaya. Platform ini dirancang untuk membuat belajar geometri menjadi lebih interaktif, menyenangkan, dan mudah dipahami.
+            </p>
+            <p style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;">
+                GeoGebra adalah trademark dari GeoGebra Foundation. Platform ini menggunakan GeoGebra Geometry untuk keperluan edukasi.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // ========== KNOWLEDGE BASE GEOMETRI ==========
+        let geometryKnowledgeBase = {
+            "pythagoras": {
+                answer: "**Teorema Pythagoras** menyatakan bahwa dalam segitiga siku-siku, kuadrat panjang sisi miring (hipotenusa) sama dengan jumlah kuadrat panjang kedua sisi lainnya.\n\n**Rumus:** \n$$c^2 = a^2 + b^2$$\n\nDimana:\n- $c$ = sisi miring (hipotenusa)\n- $a$ dan $b$ = sisi-sisi penyiku\n\n**Contoh:** Segitiga dengan sisi 3 cm dan 4 cm:\n$$c = \\sqrt{3^2 + 4^2} = \\sqrt{9 + 16} = \\sqrt{25} = 5 \\text{ cm}$$",
+                examples: ["Teorema ini ditemukan oleh Pythagoras, seorang matematikawan Yunani kuno."]
+            },
+            "luas segitiga": {
+                answer: "**Luas Segitiga** dapat dihitung dengan beberapa cara:\n\n1. **Rumus Dasar:**\n$$L = \\frac{1}{2} \\times \\text{alas} \\times \\text{tinggi}$$\n\n2. **Rumus Heron** (jika diketahui ketiga sisi):\n$$L = \\sqrt{s(s-a)(s-b)(s-c)}$$\nDimana $s = \\frac{a+b+c}{2}$ (semi-perimeter)\n\n3. **Untuk koordinat** (jika diketahui titik sudut):\n$$L = \\frac{1}{2}|x_1(y_2-y_3) + x_2(y_3-y_1) + x_3(y_1-y_2)|$$",
+                examples: ["**Contoh:** Segitiga dengan alas 6 cm dan tinggi 4 cm:\n$$L = \\frac{1}{2} \\times 6 \\times 4 = 12 \\text{ cm}^2$$"]
+            },
+            "keliling lingkaran": {
+                answer: "**Keliling Lingkaran** = $$2\\pi r$$ atau $$\\pi d$$\n\nDimana:\n- $r$ = jari-jari\n- $d$ = diameter ($d = 2r$)\n- $\\pi \\approx 3.14159$\n\n**Contoh:** Lingkaran dengan jari-jari 7 cm:\n$$K = 2 \\times \\pi \\times 7 = 14\\pi \\approx 43.98 \\text{ cm}$$",
+                examples: ["Nilai π (pi) adalah konstanta matematika yang menyatakan perbandingan keliling lingkaran dengan diameternya."]
+            },
+            "volume kubus": {
+                answer: "**Volume Kubus** = $$s^3$$\n\nDimana $s$ adalah panjang sisi.\n\n**Contoh:** Kubus dengan sisi 5 cm:\n$$V = 5^3 = 125 \\text{ cm}^3$$",
+                examples: ["Kubus memiliki 6 sisi yang semuanya persegi dengan ukuran sama."]
+            },
+            "segitiga sama sisi": {
+                answer: "**Segitiga Sama Sisi** memiliki sifat-sifat:\n\n- Ketiga sisi sama panjang\n- Ketiga sudut sama besar (masing-masing 60°)\n- Tinggi = $$\\frac{s\\sqrt{3}}{2}$$\n- Luas = $$\\frac{s^2\\sqrt{3}}{4}$$\n\nDimana $s$ adalah panjang sisi.",
+                examples: ["**Contoh:** Segitiga sama sisi dengan sisi 6 cm:\nTinggi = $$\\frac{6\\sqrt{3}}{2} = 3\\sqrt{3} \\approx 5.2 \\text{ cm}$$\nLuas = $$\\frac{36\\sqrt{3}}{4} = 9\\sqrt{3} \\approx 15.59 \\text{ cm}^2$$"]
+            },
+            "transformasi geometri": {
+                answer: "**Transformasi Geometri** adalah perubahan posisi atau bentuk objek geometri. Jenis-jenisnya:\n\n1. **Translasi**: Pergeseran\n2. **Rotasi**: Perputaran\n3. **Refleksi**: Pencerminan\n4. **Dilatasi**: Perbesaran/pengecilan\n\nSetiap transformasi memiliki matriks transformasinya sendiri.",
+                examples: ["**Contoh translasi:** Titik (2,3) ditranslasi sejauh (4,1) menjadi (6,4)"]
+            },
+            "lingkaran": {
+                answer: "**Lingkaran** adalah himpunan semua titik yang berjarak sama dari titik pusat.\n\n**Unsur-unsur lingkaran:**\n- **Jari-jari (r)**: jarak dari pusat ke tepi\n- **Diameter (d)**: 2 × jari-jari\n- **Tali busur**: ruas garis yang menghubungkan dua titik pada lingkaran\n- **Busur**: bagian dari keliling lingkaran\n- **Juring**: daerah yang dibatasi dua jari-jari dan busur\n- **Tembereng**: daerah yang dibatasi tali busur dan busur\n\n**Rumus penting:**\n- Keliling = $$2\\pi r$$\n- Luas = $$\\pi r^2$$",
+                examples: ["Lingkaran adalah bentuk geometri yang sangat penting dalam matematika dan sains."]
+            },
+            "jenis segitiga": {
+                answer: "**Jenis-jenis Segitiga** berdasarkan:\n\n**A. Berdasarkan Panjang Sisi:**\n1. **Segitiga Sama Sisi**: ketiga sisi sama\n2. **Segitiga Sama Kaki**: dua sisi sama\n3. **Segitiga Sembarang**: ketiga sisi berbeda\n\n**B. Berdasarkan Besar Sudut:**\n1. **Segitiga Lancip**: semua sudut < 90°\n2. **Segitiga Siku-siku**: satu sudut = 90°\n3. **Segitiga Tumpul**: satu sudut > 90°",
+                examples: ["Jumlah sudut dalam segitiga selalu 180°."]
+            },
+            "kongruen segitiga": {
+                answer: "**Kekongruenan Segitiga** berarti dua segitiga memiliki bentuk dan ukuran yang sama.\n\n**Syarat-syarat kekongruenan:**\n1. **Sisi-Sisi-Sisi (SSS)**: ketiga sisi sama\n2. **Sisi-Sudut-Sisi (SAS)**: dua sisi dan sudut apitnya sama\n3. **Sudut-Sisi-Sudut (ASA)**: dua sudut dan sisi di antaranya sama\n4. **Sudut-Sudut-Sisi (AAS)**: dua sudut dan satu sisi yang tidak diapit sama",
+                examples: ["Dua segitiga kongruen dapat saling menutupi dengan tepat."]
+            },
+            "luas permukaan bola": {
+                answer: "**Luas Permukaan Bola** = $$4\\pi r^2$$\n\nDimana $r$ adalah jari-jari bola.\n\n**Contoh:** Bola dengan jari-jari 10 cm:\n$$L = 4 \\times \\pi \\times 10^2 = 400\\pi \\approx 1256.64 \\text{ cm}^2$$",
+                examples: ["Bola adalah bangun ruang tiga dimensi yang sempurna simetris."]
+            },
+            "volume tabung": {
+                answer: "**Volume Tabung** = $$\\pi r^2 t$$\n\nDimana:\n- $r$ = jari-jari alas\n- $t$ = tinggi tabung\n\n**Contoh:** Tabung dengan jari-jari 7 cm dan tinggi 10 cm:\n$$V = \\pi \\times 7^2 \\times 10 = 490\\pi \\approx 1539.38 \\text{ cm}^3$$",
+                examples: ["Tabung memiliki 2 sisi lingkaran (alas dan tutup) dan 1 sisi lengkung."]
+            },
+            "sudut dalam segitiga": {
+                answer: "**Sifat Sudut dalam Segitiga:**\n\n1. **Jumlah sudut** = 180°\n2. **Sudut luar** = jumlah dua sudut dalam yang tidak berpelurus dengannya\n3. Pada segitiga siku-siku, dua sudut selain sudut siku-siku adalah sudut lancip yang saling berkomplemen (jumlahnya 90°)",
+                examples: ["**Contoh:** Jika dua sudut segitiga adalah 50° dan 60°, maka sudut ketiga = 180° - (50° + 60°) = 70°"]
+            }
+        };
+
+        // ========== NAVIGATION SYSTEM ==========
+        function initializeNavigation() {
+            // Navigasi untuk AI-Lokal
+            document.getElementById('nav-ai-lokal').addEventListener('click', function(e) {
+                e.preventDefault();
+                // Scroll ke section geometri
+                document.getElementById('geometri').scrollIntoView({ behavior: 'smooth' });
+                // Aktifkan AI view setelah scroll selesai
+                setTimeout(() => {
+                    document.getElementById('toggle-ai').click();
+                }, 500);
+            });
+
+            // Navigasi untuk Beranda
+            document.querySelector('a[href="#home"]').addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelector('.hero').scrollIntoView({ behavior: 'smooth' });
+            });
+
+            // Navigasi untuk Geometri
+            document.querySelector('a[href="#geometri"]').addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('geometri').scrollIntoView({ behavior: 'smooth' });
+            });
+        }
+
+        // ========== GEOGEBRA SUB-TOGGLE SYSTEM ==========
+        function initializeGeoGebraSubToggle() {
+            const toggle2D = document.getElementById('toggle-2d');
+            const toggle3D = document.getElementById('toggle-3d');
+            const iframe2D = document.getElementById('geogebra-iframe-2d');
+            const iframe3D = document.getElementById('geogebra-iframe-3d');
+            
+            toggle2D.addEventListener('click', function() {
+                toggle2D.classList.add('active');
+                toggle3D.classList.remove('active');
+                iframe2D.classList.add('active');
+                iframe3D.classList.remove('active');
+                currentGeoGebraIframe = iframe2D;
+            });
+            
+            toggle3D.addEventListener('click', function() {
+                toggle3D.classList.add('active');
+                toggle2D.classList.remove('active');
+                iframe3D.classList.add('active');
+                iframe2D.classList.remove('active');
+                currentGeoGebraIframe = iframe3D;
+            });
+        }
+
+        // ========== VIEW TOGGLE SYSTEM ==========
+        function initializeViewToggle() {
+            const toggleGeogebra = document.getElementById('toggle-geogebra');
+            const toggleAI = document.getElementById('toggle-ai');
+            const geogebraView = document.getElementById('geogebra-view');
+            const aiView = document.getElementById('ai-view');
+            
+            toggleGeogebra.addEventListener('click', function() {
+                toggleGeogebra.classList.add('active');
+                toggleAI.classList.remove('active');
+                geogebraView.classList.add('active');
+                aiView.classList.remove('active');
+            });
+            
+            toggleAI.addEventListener('click', function() {
+                toggleAI.classList.add('active');
+                toggleGeogebra.classList.remove('active');
+                aiView.classList.add('active');
+                geogebraView.classList.remove('active');
+            });
+        }
+
+        // ========== GEOGEBRA IFRAME FUNCTIONS ==========
+        let currentGeoGebraIframe = document.getElementById('geogebra-iframe-2d');
+
+        function reloadGeoGebra() {
+            currentGeoGebraIframe.src = currentGeoGebraIframe.src;
+            showNotification('🔄 GeoGebra dimuat ulang!', 'success');
+        }
+
+        function openInNewTab() {
+            window.open(currentGeoGebraIframe.src, '_blank');
+        }
+
+        function loadExample(exampleType) {
+            let message = '';
+            
+            switch(exampleType) {
+                case 'pythagoras':
+                    message = 'Membuka GeoGebra untuk contoh Segitiga Pythagoras. Gunakan tools GeoGebra untuk membuat segitiga siku-siku dan verifikasi teorema Pythagoras.';
+                    break;
+                case 'circle':
+                    message = 'Membuka GeoGebra untuk contoh Lingkaran & Garis Singgung. Coba buat lingkaran dan garis singgungnya.';
+                    break;
+                case 'triangle':
+                    message = 'Membuka GeoGebra untuk contoh Segitiga Sama Sisi. Perhatikan bahwa semua sisi dan sudutnya sama.';
+                    break;
+                case 'polygon':
+                    message = 'Membuka GeoGebra untuk contoh Poligon Beraturan. Coba buat poligon dengan sisi berbeda-beda.';
+                    break;
+            }
+            
+            showNotification('✅ ' + message, 'success');
+        }
+
+        // ========== AI SYSTEM ==========
+        let chatHistory = [];
+
+        function initializeAISystem() {
+            updateKnowledgeStats();
+            loadCustomKnowledge();
+            
+            // Event listeners for AI
+            document.getElementById('ai-send').addEventListener('click', sendMessageToAI);
+            document.getElementById('ai-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessageToAI();
+                }
+            });
+
+            // Example questions
+            document.querySelectorAll('.example-question').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const question = this.getAttribute('data-question');
+                    document.getElementById('ai-input').value = question;
+                    sendMessageToAI();
+                });
+            });
+
+            document.getElementById('add-knowledge').addEventListener('click', function() {
+                document.getElementById('knowledge-modal').style.display = 'flex';
+            });
+
+            document.getElementById('show-knowledge-base').addEventListener('click', function() {
+                showKnowledgeBase();
+            });
+
+            document.getElementById('cancel-add-knowledge').addEventListener('click', function() {
+                document.getElementById('knowledge-modal').style.display = 'none';
+            });
+
+            document.getElementById('close-view-knowledge').addEventListener('click', function() {
+                document.getElementById('view-knowledge-modal').style.display = 'none';
+            });
+
+            document.getElementById('save-knowledge').addEventListener('click', function() {
+                saveNewKnowledge();
+            });
+
+            document.getElementById('clear-chat').addEventListener('click', function() {
+                document.getElementById('ai-chat').innerHTML = '';
+                chatHistory = [];
+                addMessageToChat('🗑️ Percakapan telah dibersihkan. Silakan ajukan pertanyaan baru!', 'bot');
+            });
+        }
+
+        async function sendMessageToAI() {
+            const input = document.getElementById('ai-input');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Switch to AI view if not already
+            document.getElementById('toggle-ai').click();
+            
+            // Add user message to chat
+            addMessageToChat(message, 'user');
+            chatHistory.push({ role: "user", content: message });
+            
+            input.value = '';
+            input.disabled = true;
+            document.getElementById('ai-send').disabled = true;
+            
+            // Show thinking indicator
+            const thinkingMsg = addMessageToChat('🤔 AI sedang berpikir...', 'bot', 'thinking');
+            
+            // Simulate delay for natural feel
+            setTimeout(() => {
+                try {
+                    const response = getLocalAIResponse(message);
+                    
+                    // Remove thinking message and add actual response
+                    thinkingMsg.remove();
+                    addMessageToChat(response, 'bot');
+                    chatHistory.push({ role: "assistant", content: response });
+                    
+                    // Re-render MathJax for math formulas
+                    if (typeof MathJax !== 'undefined' && MathJax.typeset) {
+                        MathJax.typeset();
+                    }
+                    
+                } catch (error) {
+                    console.error('AI Error:', error);
+                    thinkingMsg.remove();
+                    addMessageToChat('❌ Terjadi kesalahan: ' + error.message, 'bot', 'error');
+                } finally {
+                    input.disabled = false;
+                    document.getElementById('ai-send').disabled = false;
+                    input.focus();
+                }
+            }, 1000);
+        }
+
+        function getLocalAIResponse(message) {
+            const lowerMessage = message.toLowerCase();
+            let bestMatch = { keyword: null, score: 0 };
+            
+            // Find the best matching keyword
+            Object.keys(geometryKnowledgeBase).forEach(keyword => {
+                if (lowerMessage.includes(keyword)) {
+                    const score = keyword.length;
+                    if (score > bestMatch.score) {
+                        bestMatch = { keyword, score };
+                    }
+                }
+            });
+            
+            if (bestMatch.keyword) {
+                const knowledge = geometryKnowledgeBase[bestMatch.keyword];
+                let response = `${knowledge.answer}`;
+                
+                if (knowledge.examples && knowledge.examples.length > 0) {
+                    response += `\n\n**Contoh:**\n${knowledge.examples.join('\n')}`;
+                }
+                
+                return response;
+            }
+            
+            // If not found, provide list of available topics
+            const availableTopics = Object.keys(geometryKnowledgeBase).slice(0, 8).join(', ');
+            return `Maaf, saya belum mempelajari topik "${message}" dalam basis pengetahuan lokal. \n\n**Pertanyaan yang bisa saya jawab:**\n- ${availableTopics}\n- ...dan masih banyak lagi\n\n**Tips:** Gunakan kata kunci yang lebih spesifik atau tambahkan pengetahuan baru dengan tombol "➕ Tambah Pengetahuan".`;
+        }
+
+        function addMessageToChat(message, sender, type = 'normal') {
+            const chat = document.getElementById('ai-chat');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `ai-message ai-${sender} ${type === 'thinking' ? 'ai-thinking' : ''} ${type === 'error' ? 'ai-error' : ''} ${type === 'success' ? 'ai-success' : ''}`;
+            
+            // Format message with simple markdown
+            let formattedMessage = message
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/\n/g, '<br>');
+            
+            messageDiv.innerHTML = formattedMessage;
+            
+            // Add copy button for bot messages
+            if (sender === 'bot' && type !== 'thinking') {
+                const copyBtn = document.createElement('button');
+                copyBtn.className = 'copy-btn';
+                copyBtn.textContent = '📋';
+                copyBtn.title = 'Salin teks';
+                copyBtn.addEventListener('click', function() {
+                    copyToClipboard(message);
+                });
+                messageDiv.appendChild(copyBtn);
+            }
+            
+            chat.appendChild(messageDiv);
+            chat.scrollTop = chat.scrollHeight;
+            return messageDiv;
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                // Show simple feedback
+                const originalText = event.target.textContent;
+                event.target.textContent = '✅';
+                setTimeout(() => {
+                    event.target.textContent = originalText;
+                }, 1000);
+            }).catch(err => {
+                console.error('Gagal menyalin: ', err);
+                event.target.textContent = '❌';
+                setTimeout(() => {
+                    event.target.textContent = '📋';
+                }, 1000);
+            });
+        }
+
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 1rem 1.5rem;
+                background: ${type === 'success' ? '#10b981' : '#2563eb'};
+                color: white;
+                border-radius: 8px;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                z-index: 1001;
+                animation: slideIn 0.3s ease-out;
+            `;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-in';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // ========== KNOWLEDGE BASE MANAGEMENT ==========
+        function updateKnowledgeStats() {
+            const statsElement = document.getElementById('knowledge-stats');
+            const topicCount = Object.keys(geometryKnowledgeBase).length;
+            statsElement.innerHTML = `
+                <strong>${topicCount} topik geometri</strong> tersedia<br>
+                <small>Termasuk ${countFormulas()} rumus matematika</small>
+            `;
+        }
+
+        function countFormulas() {
+            let formulaCount = 0;
+            Object.values(geometryKnowledgeBase).forEach(knowledge => {
+                const formulaMatches = knowledge.answer.match(/\$/g);
+                if (formulaMatches) {
+                    formulaCount += Math.floor(formulaMatches.length / 2);
+                }
+            });
+            return formulaCount;
+        }
+
+        function saveNewKnowledge() {
+            const keywordsInput = document.getElementById('new-keywords').value.trim();
+            const answerInput = document.getElementById('new-answer').value.trim();
+            const examplesInput = document.getElementById('new-examples').value.trim();
+            
+            if (!keywordsInput || !answerInput) {
+                alert('Kata kunci dan jawaban harus diisi!');
+                return;
+            }
+            
+            const keywords = keywordsInput.split(',').map(k => k.trim().toLowerCase()).filter(k => k);
+            
+            if (keywords.length === 0) {
+                alert('Masukkan minimal satu kata kunci!');
+                return;
+            }
+            
+            const newKnowledge = {
+                answer: answerInput,
+                examples: examplesInput ? [examplesInput] : []
+            };
+            
+            keywords.forEach(keyword => {
+                geometryKnowledgeBase[keyword] = newKnowledge;
+            });
+            
+            saveCustomKnowledge();
+            updateKnowledgeStats();
+            
+            document.getElementById('new-keywords').value = '';
+            document.getElementById('new-answer').value = '';
+            document.getElementById('new-examples').value = '';
+            document.getElementById('knowledge-modal').style.display = 'none';
+            
+            showNotification(`✅ Berhasil menambahkan pengetahuan baru: "${keywords.join(', ')}"`, 'success');
+        }
+
+        function showKnowledgeBase() {
+            const modal = document.getElementById('view-knowledge-modal');
+            const listElement = document.getElementById('knowledge-base-list');
+            
+            let html = '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem;">';
+            
+            Object.keys(geometryKnowledgeBase).sort().forEach(keyword => {
+                const knowledge = geometryKnowledgeBase[keyword];
+                const exampleCount = knowledge.examples ? knowledge.examples.length : 0;
+                
+                html += `
+                    <div style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; background: #f8fafc;">
+                        <strong>${keyword}</strong>
+                        <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.5rem;">
+                            ${exampleCount} contoh • ${knowledge.answer.length > 100 ? knowledge.answer.substring(0, 100) + '...' : knowledge.answer}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            listElement.innerHTML = html;
+            modal.style.display = 'flex';
+        }
+
+        function saveCustomKnowledge() {
+            localStorage.setItem('custom_geometry_knowledge', JSON.stringify(geometryKnowledgeBase));
+        }
+
+        function loadCustomKnowledge() {
+            const savedKnowledge = localStorage.getItem('custom_geometry_knowledge');
+            if (savedKnowledge) {
+                try {
+                    const customKnowledge = JSON.parse(savedKnowledge);
+                    geometryKnowledgeBase = { ...geometryKnowledgeBase, ...customKnowledge };
+                    console.log('Loaded custom knowledge:', Object.keys(customKnowledge).length, 'topics');
+                } catch (error) {
+                    console.error('Error loading custom knowledge:', error);
+                }
+            }
+        }
+
+        // ========== INITIALIZATION ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeNavigation();
+            initializeGeoGebraSubToggle();
+            initializeViewToggle();
+            initializeAISystem();
+            
+            // Add CSS for notification animations
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                @keyframes slideOut {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            console.log('System Loaded: Navigation + GeoGebra Sub-toggle + Toggle View + AI Local');
+        });
+    </script>
+</body>
+</html>
