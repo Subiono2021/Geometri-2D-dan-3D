@@ -748,8 +748,10 @@
                             </div>
                             
                             <div class="chat-controls">
-                                <button id="clear-chat" class="btn btn-secondary">🗑️ Bersihkan Chat</button>
-                                <button id="add-knowledge" class="btn btn-success">➕ Tambah Pengetahuan</button>
+    <button id="clear-chat" class="btn btn-secondary">🗑️ Bersihkan Chat</button>
+    <button id="add-knowledge" class="btn btn-success" disabled>➕ Tambah Pengetahuan</button>
+    <button id="admin-login-btn" class="btn btn-info">🔐 Login Admin</button>
+    <button id="admin-logout-btn" class="btn btn-secondary" style="display: none;">🚪 Logout</button>
                             </div>
                         </div>
                     </div>
@@ -1189,6 +1191,11 @@
         }
 
         function saveNewKnowledge() {
+		    if (!isAdminLoggedIn()) {
+                alert('Anda harus login sebagai admin untuk menambah pengetahuan.');
+                document.getElementById('knowledge-modal').style.display = 'none';
+                return;
+            }
             const keywordsInput = document.getElementById('new-keywords').value.trim();
             const answerInput = document.getElementById('new-answer').value.trim();
             const examplesInput = document.getElementById('new-examples').value.trim();
@@ -1290,8 +1297,94 @@
             
             console.log('System Loaded: Navigation + GeoGebra Sub-toggle + Toggle View + AI Local');
         });
-    </script>
+		
+		
+// ========== ADMIN LOGIN SYSTEM (DELEGASI EVENT) ==========
+const ADMIN_PASSWORD = "bimath_admin";
+
+// Cek status login dari sessionStorage
+function isAdminLoggedIn() {
+    return sessionStorage.getItem('adminLoggedIn') === 'true';
+}
+
+// Perbarui UI tombol
+function updateAdminUI() {
+    const addBtn = document.getElementById('add-knowledge');
+    const loginBtn = document.getElementById('admin-login-btn');
+    const logoutBtn = document.getElementById('admin-logout-btn');
+    if (addBtn) addBtn.disabled = !isAdminLoggedIn();
+    if (loginBtn) loginBtn.style.display = isAdminLoggedIn() ? 'none' : 'inline-block';
+    if (logoutBtn) logoutBtn.style.display = isAdminLoggedIn() ? 'inline-block' : 'none';
+}
+
+// Pasang satu event listener di document untuk menangani klik pada tombol admin
+document.addEventListener('click', function(e) {
+    const target = e.target;
+
+    // Tombol "Login Admin"
+    if (target.id === 'admin-login-btn') {
+        e.preventDefault();
+        const modal = document.getElementById('admin-login-modal');
+        if (modal) modal.style.display = 'flex';
+    }
+
+    // Tombol "Batal" di modal login
+    if (target.id === 'cancel-admin-login') {
+        e.preventDefault();
+        const modal = document.getElementById('admin-login-modal');
+        const passInput = document.getElementById('admin-password');
+        if (modal) modal.style.display = 'none';
+        if (passInput) passInput.value = '';
+    }
+
+    // Tombol "Login" di modal login
+    if (target.id === 'submit-admin-login') {
+        e.preventDefault();
+        const passInput = document.getElementById('admin-password');
+        if (passInput && passInput.value === ADMIN_PASSWORD) {
+            sessionStorage.setItem('adminLoggedIn', 'true');
+            updateAdminUI();
+            const modal = document.getElementById('admin-login-modal');
+            if (modal) modal.style.display = 'none';
+            passInput.value = '';
+            showNotification('✅ Login admin berhasil!', 'success');
+        } else if (passInput) {
+            alert('Password salah!');
+        }
+    }
+
+    // Tombol "Logout"
+    if (target.id === 'admin-logout-btn') {
+        e.preventDefault();
+        sessionStorage.removeItem('adminLoggedIn');
+        updateAdminUI();
+        showNotification('🔓 Logout berhasil', 'info');
+    }
+});
+
+// Inisialisasi UI setelah DOM siap
+document.addEventListener('DOMContentLoaded', function() {
+    updateAdminUI();
+});
+		
+		
+</script>
+	
+<!-- Modal Login Admin -->
+<div id="admin-login-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+    <div style="background: white; padding: 2rem; border-radius: 12px; width: 90%; max-width: 400px;">
+        <h3 style="margin-bottom: 1rem; color: var(--primary);">🔐 Login Admin</h3>
+        <div style="margin-bottom: 1rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Password:</label>
+            <input type="password" id="admin-password" placeholder="Masukkan password admin" style="width: 100%; padding: 0.7rem; border: 2px solid #cbd5e1; border-radius: 6px;">
+        </div>
+        <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+            <button id="cancel-admin-login" class="btn btn-secondary">Batal</button>
+            <button id="submit-admin-login" class="btn btn-success">Login</button>
+        </div>
+    </div>
+</div>
+	
 </body>
 
 </html>
-
